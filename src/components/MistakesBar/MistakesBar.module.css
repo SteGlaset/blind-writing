@@ -1,0 +1,16 @@
+.mistakesWrapper {
+    display: flex;
+}
+.mistakesIcon {
+    content: url('../../assets/icons/mistake.svg');
+    width: 15px;
+    margin-right: 5px;
+}
+.mistakesPercentage {
+    color: #ba1a1a;
+}
+
+.lastMistakesPercentage {
+    color: #ba1a1a;
+    opacity: .4;
+}
