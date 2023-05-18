@@ -1,0 +1,8 @@
+.headerWrapper {
+  display: flex;
+}
+
+.logoIcon {
+  width: 45px;
+  margin-right: 5px;
+}
