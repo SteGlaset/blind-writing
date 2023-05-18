@@ -3,6 +3,7 @@ import { createRef, FormEvent, RefObject, useEffect, useState } from 'react';
 import cl from './Trainer.module.css';
 import Container from '~/components/ui/Container/Container';
 import MistakesBar from '~/components/MistakesBar/MistakesBar';
+import SpeedBar from '~/components/SpeedBar/SpeedBar';
 
 const Trainer = () => {
   const [text, setText] = useState('');
@@ -11,6 +12,8 @@ const Trainer = () => {
   const [mistakeFlag, setMistakeFlag] = useState(false);
   const [mistakes, setMistakes] = useState(0);
   const [lastMistakes, setLastMistakes] = useState<string | null>(null);
+  const [speed, setSpeed] = useState(0);
+  const [startTime, setStartTime] = useState<number | null>(null);
   const spanRef: RefObject<HTMLSpanElement> = createRef();
 
   const getText = (): void => {
@@ -34,6 +37,7 @@ const Trainer = () => {
     setMistakeFlag(false);
     if (position && position === text.length) {
       setLastMistakes(getMistakesPercentage());
+      setSpeed(Math.ceil((text.length / ((Date.now() - (startTime as number)) / 1000)) * 60));
       clearParameters();
       getText();
     }
@@ -45,11 +49,16 @@ const Trainer = () => {
   }, [mistakeFlag]);
 
   const handleInput = (event: FormEvent<HTMLTextAreaElement>): void => {
-    const value: string = (event.target as HTMLInputElement).value;
-    const isValueLonger: boolean = value.length + 1 > position;
+    const inputValue: string = (event.target as HTMLInputElement).value;
+    if (!value.length) {
+      setStartTime(Date.now());
+      console.log('start');
+    }
+    const isValueLonger: boolean = inputValue.length + 1 > position;
     if (isValueLonger) {
-      setValue(value);
-      if (value[position] === text[position]) {
+      console.table([text.length, startTime, Date.now(), Date.now() - (startTime as number)]);
+      setValue(inputValue);
+      if (inputValue[position] === text[position]) {
         setPosition(position + 1);
         spanRef.current!.className = cl.pendingChar;
       } else {
@@ -61,10 +70,8 @@ const Trainer = () => {
 
   return (
     <Container className={cl.trainerWrapper}>
-      <MistakesBar
-        percentage={getMistakesPercentage()}
-        lastPercentage={lastMistakes}
-      />
+      <SpeedBar speed={speed} />
+      <MistakesBar percentage={getMistakesPercentage()} lastPercentage={lastMistakes} />
       <textarea
         className={cl.textarea}
         maxLength={position + 1}

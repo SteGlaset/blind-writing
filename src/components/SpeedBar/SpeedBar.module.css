@@ -1,0 +1,14 @@
+.speedWrapper {
+    display: inline-flex;
+    margin-right: 10px;
+}
+
+.speedIcon {
+    content: url('../../assets/icons/speed.svg');
+    width: 20px;
+    margin-right: 6px;
+}
+
+.speed {
+    color: #2DB36F;
+}

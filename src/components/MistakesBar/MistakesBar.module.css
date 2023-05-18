@@ -1,5 +1,5 @@
 .mistakesWrapper {
-    display: flex;
+    display: inline-flex;
 }
 .mistakesIcon {
     content: url('../../assets/icons/mistake.svg');
