@@ -1,4 +1,4 @@
-## **Deploy*
+## **Deploy**
 https://steglaset.github.io/blind-writing/dist/
 
 ## **Using**
