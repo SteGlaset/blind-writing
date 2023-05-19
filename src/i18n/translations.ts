@@ -17,4 +17,4 @@ export const i18nSpeedTitle: i18n = {
 export const i18nSpeedPerSecond: i18n = {
   en: 'characters per minute',
   ru: 'символов в минуту',
-}
+};

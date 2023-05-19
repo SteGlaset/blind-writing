@@ -3,7 +3,6 @@ export interface IRussianResponse {
   text: string;
 }
 
-
 const getRussianText = async (): Promise<IRussianResponse> => {
   const response: Response = await fetch(
     'https://fish-text.ru/get?type=sentence&number=1&format=json',

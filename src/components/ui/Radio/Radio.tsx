@@ -13,7 +13,9 @@ const Radio = ({ ...props }: InputHTMLAttributes<HTMLInputElement>): ReactElemen
         checked={props.checked}
         className={cl.radio}
       />
-      <label htmlFor={props.id} className={cl.label}>{props.children}</label>
+      <label htmlFor={props.id} className={cl.label}>
+        {props.children}
+      </label>
     </>
   );
 };
