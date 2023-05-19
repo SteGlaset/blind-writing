@@ -8,7 +8,7 @@ const useDidUpdateEffect = (effect: EffectCallback, deps: DependencyList | undef
       return effect();
     }
     didMountRef.current = true;
-  }, deps);
-}
+  }, [deps, effect]);
+};
 
 export default useDidUpdateEffect;

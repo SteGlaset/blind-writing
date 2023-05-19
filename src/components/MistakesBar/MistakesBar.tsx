@@ -13,7 +13,9 @@ const MistakesBar = ({ percentage, lastPercentage }: IProps): ReactElement => {
   return (
     <div className={cl.mistakesWrapper}>
       <i title={i18nMistakeTitle[locale]} className={cl.mistakesIcon}></i>
-      <p title={i18nMistakeTitle[locale]} className={cl.mistakesPercentage}>{percentage}% </p>
+      <p title={i18nMistakeTitle[locale]} className={cl.mistakesPercentage}>
+        {percentage}%{' '}
+      </p>
       {lastPercentage && (
         <p title={i18nLastMistakeTitle[locale]} className={cl.lastMistakesPercentage}>
           &nbsp;/ {lastPercentage}%

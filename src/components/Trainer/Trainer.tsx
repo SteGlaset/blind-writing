@@ -6,8 +6,9 @@ import {
   MutableRefObject,
   RefObject,
   useEffect,
+  useMemo,
   useRef,
-  useState
+  useState,
 } from 'react';
 import cl from './Trainer.module.css';
 import Container from '~/components/ui/Container/Container';
@@ -30,18 +31,20 @@ const Trainer = () => {
   const lastMistakes: MutableRefObject<string | null> = useRef(null);
   const speed: MutableRefObject<number> = useRef(0);
   const startTime: MutableRefObject<number | null> = useRef(null);
-  const textGetters: { [key: string]: () => void } = {
-    en: () => {
-      getEnglishText()
-        .then((data) => setText(...data))
-        .catch((error) => console.error(error));
-    },
-    ru: () => {
-      getRussianText()
-        .then((data) => setText(data.text))
-        .catch((error) => console.error(error))
-    },
-  };
+  const textGetters: { [key: string]: () => void } = useMemo(() => {
+    return {
+      en: () => {
+        getEnglishText()
+          .then((data) => setText(...data))
+          .catch((error) => console.error(error));
+      },
+      ru: () => {
+        getRussianText()
+          .then((data) => setText(data.text))
+          .catch((error) => console.error(error));
+      },
+    };
+  }, []);
   const clearParameters = (): void => {
     setValue('');
     setPosition(0);
@@ -50,11 +53,13 @@ const Trainer = () => {
   useEffect(() => {
     clearParameters();
     textGetters[textLang]();
-  }, [textLang]);
+  }, [textLang, textGetters]);
   useDidUpdateEffect(() => {
     if (position && position === text.length) {
       lastMistakes.current = getMistakesPercentage(text, mistakes);
-      speed.current = Math.ceil((text.length / ((Date.now() - (startTime.current as number)) / 1000)) * 60);
+      speed.current = Math.ceil(
+        (text.length / ((Date.now() - (startTime.current as number)) / 1000)) * 60,
+      );
       clearParameters();
       textGetters[textLang]();
     }
@@ -102,7 +107,9 @@ const Trainer = () => {
               onChange={(event) => handleCheckbox(event)}
               name='textLang'
               checked={lang === textLang}
-            >{lang}</Radio>
+            >
+              {lang}
+            </Radio>
           ))}
         </div>
       </div>

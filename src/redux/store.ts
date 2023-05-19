@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import localeReducer from './localeSlice/localeSlice'
+import localeReducer from './localeSlice/localeSlice';
 
 export const store = configureStore({
   reducer: {
