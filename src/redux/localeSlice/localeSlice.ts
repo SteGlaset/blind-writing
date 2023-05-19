@@ -6,7 +6,7 @@ interface ILocaleState {
 }
 
 const initialState: ILocaleState = {
-  lang: navigator.languages[0] || 'en',
+  lang: navigator.languages[1] || 'en',
 };
 
 export const localeSlice = createSlice({

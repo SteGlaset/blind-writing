@@ -1,93 +1,120 @@
 import getRussianText from '~/api/getRussianText';
-import { createRef, FormEvent, RefObject, useEffect, useState } from 'react';
+import {
+  ChangeEvent,
+  createRef,
+  FormEvent,
+  MutableRefObject,
+  RefObject,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 import cl from './Trainer.module.css';
 import Container from '~/components/ui/Container/Container';
 import MistakesBar from '~/components/MistakesBar/MistakesBar';
 import SpeedBar from '~/components/SpeedBar/SpeedBar';
+import { getMistakesPercentage } from '~/utils/utilities';
+import TrainerTextBox from '~/components/TrainerTextBox/TrainerTextBox';
+import Radio from '~/components/ui/Radio/Radio';
+import useDidUpdateEffect from '~/hooks/useDidUpdateEffect';
+import getEnglishText from '~/api/getEnglishText';
 
 const Trainer = () => {
   const [text, setText] = useState('');
   const [value, setValue] = useState('');
   const [position, setPosition] = useState(0);
-  const [mistakeFlag, setMistakeFlag] = useState(false);
   const [mistakes, setMistakes] = useState(0);
-  const [lastMistakes, setLastMistakes] = useState<string | null>(null);
-  const [speed, setSpeed] = useState(0);
-  const [startTime, setStartTime] = useState<number | null>(null);
+  const [textLang, setTextLang] = useState('ru');
   const spanRef: RefObject<HTMLSpanElement> = createRef();
-
-  const getText = (): void => {
-    getRussianText()
-      .then((data) => setText(data.text))
-      .catch((error) => console.error(error));
+  const isMistaken: MutableRefObject<boolean> = useRef(false);
+  const lastMistakes: MutableRefObject<string | null> = useRef(null);
+  const speed: MutableRefObject<number> = useRef(0);
+  const startTime: MutableRefObject<number | null> = useRef(null);
+  const textGetters: { [key: string]: () => void } = {
+    en: () => {
+      getEnglishText()
+        .then((data) => setText(...data))
+        .catch((error) => console.error(error));
+    },
+    ru: () => {
+      getRussianText()
+        .then((data) => setText(data.text))
+        .catch((error) => console.error(error))
+    },
   };
   const clearParameters = (): void => {
     setValue('');
     setPosition(0);
     setMistakes(0);
   };
-  const getMistakesPercentage = (): string => {
-    return ((mistakes / text.length) * 100).toFixed(2);
-  };
   useEffect(() => {
     clearParameters();
-    getText();
-  }, []);
-  useEffect(() => {
-    setMistakeFlag(false);
+    textGetters[textLang]();
+  }, [textLang]);
+  useDidUpdateEffect(() => {
     if (position && position === text.length) {
-      setLastMistakes(getMistakesPercentage());
-      setSpeed(Math.ceil((text.length / ((Date.now() - (startTime as number)) / 1000)) * 60));
+      lastMistakes.current = getMistakesPercentage(text, mistakes);
+      speed.current = Math.ceil((text.length / ((Date.now() - (startTime.current as number)) / 1000)) * 60);
       clearParameters();
-      getText();
+      textGetters[textLang]();
     }
-  }, [position, text.length]);
-  useEffect(() => {
-    if (mistakeFlag) {
-      setMistakes((state) => state + 1);
-    }
-  }, [mistakeFlag]);
-
+  }, [position, text]);
   const handleInput = (event: FormEvent<HTMLTextAreaElement>): void => {
-    const inputValue: string = (event.target as HTMLInputElement).value;
     if (!value.length) {
-      setStartTime(Date.now());
-      console.log('start');
+      startTime.current = Date.now();
     }
+    const inputValue: string = (event.target as HTMLInputElement).value;
     const isValueLonger: boolean = inputValue.length + 1 > position;
     if (isValueLonger) {
-      console.table([text.length, startTime, Date.now(), Date.now() - (startTime as number)]);
       setValue(inputValue);
       if (inputValue[position] === text[position]) {
-        setPosition(position + 1);
+        setPosition((state) => state + 1);
         spanRef.current!.className = cl.pendingChar;
-      } else {
-        setMistakeFlag(true);
+        isMistaken.current = false;
+      } else if (!isMistaken.current) {
+        setMistakes((state) => state + 1);
+        isMistaken.current = true;
         spanRef.current!.className = cl.erroredChar;
       }
     }
   };
-
+  const handleCheckbox = (event: ChangeEvent<HTMLInputElement>): void => {
+    if (event.currentTarget.checked) {
+      setTextLang(event.target.lang);
+    }
+  };
   return (
     <Container className={cl.trainerWrapper}>
-      <SpeedBar speed={speed} />
-      <MistakesBar percentage={getMistakesPercentage()} lastPercentage={lastMistakes} />
+      <div className={cl.bar}>
+        <div>
+          <SpeedBar speed={speed.current} />
+          <MistakesBar
+            percentage={getMistakesPercentage(text, mistakes)}
+            lastPercentage={lastMistakes.current}
+          />
+        </div>
+        <div>
+          {Object.keys(textGetters).map((lang, i) => (
+            <Radio
+              key={lang + i}
+              id={`${lang}Radio`}
+              lang={lang}
+              onChange={(event) => handleCheckbox(event)}
+              name='textLang'
+              checked={lang === textLang}
+            >{lang}</Radio>
+          ))}
+        </div>
+      </div>
       <textarea
         className={cl.textarea}
         maxLength={position + 1}
-        minLength={position}
         onInput={(event) => handleInput(event)}
         value={value}
         autoCorrect='false'
         autoFocus={true}
       />
-      <p className={cl.pendingText}>
-        {text.split('', position)}
-        <span ref={spanRef} className={cl.pendingChar}>
-          {text[position]}
-        </span>
-        {text.slice(position + 1)}
-      </p>
+      <TrainerTextBox ref={spanRef} text={text} position={position} />
     </Container>
   );
 };

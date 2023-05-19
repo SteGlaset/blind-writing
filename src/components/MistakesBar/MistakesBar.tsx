@@ -10,7 +10,6 @@ interface IProps {
 }
 const MistakesBar = ({ percentage, lastPercentage }: IProps): ReactElement => {
   const locale = useSelector((state: RootState) => state.locale.lang);
-
   return (
     <div className={cl.mistakesWrapper}>
       <i title={i18nMistakeTitle[locale]} className={cl.mistakesIcon}></i>

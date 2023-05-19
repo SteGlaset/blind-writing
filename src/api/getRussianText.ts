@@ -1,4 +1,8 @@
-import { IRussianResponse } from '~/types/interfaces';
+export interface IRussianResponse {
+  status: number;
+  text: string;
+}
+
 
 const getRussianText = async (): Promise<IRussianResponse> => {
   const response: Response = await fetch(

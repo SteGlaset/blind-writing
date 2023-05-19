@@ -1,5 +1,5 @@
 .container {
-    max-width: 1200px;
+    max-width: min(1200px, calc(100% - 50px));
     padding-inline: 10px;
     margin-inline: auto;
 }
