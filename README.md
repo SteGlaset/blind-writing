@@ -1,3 +1,6 @@
+## **Deploy**
+https://steglaset.github.io/blind-writing/dist/
+
 ## **Using**
 
 1. Install Packages
