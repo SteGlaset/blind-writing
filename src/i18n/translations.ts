@@ -1,4 +1,9 @@
 type i18n = { [index: string]: string };
+
+export const languagesList: i18n = {
+  en: 'en',
+  ru: 'ru',
+};
 export const i18nMistakeTitle: i18n = {
   en: 'Mistakes',
   ru: 'Ошибок',

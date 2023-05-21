@@ -1,12 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { languagesList } from '~/i18n/translations';
 
 interface ILocaleState {
   lang: string;
 }
 
 const initialState: ILocaleState = {
-  lang: navigator.languages[0] || 'en',
+  lang: languagesList[navigator.languages[0].slice(0, 2)] || 'en',
 };
 
 export const localeSlice = createSlice({
@@ -14,7 +15,7 @@ export const localeSlice = createSlice({
   initialState,
   reducers: {
     changeLocale: (state, action: PayloadAction<string>) => {
-      state.lang = action.payload;
+      state.lang ||= languagesList[action.payload];
     },
   },
 });
